@@ -7,6 +7,7 @@ import training.quizTdd.appcore.domainservices.QuizService
 import training.quizTdd.infrastructure.api.dtos.AnswerResponseDto
 import training.quizTdd.infrastructure.api.dtos.QuizRequestDto
 import training.quizTdd.infrastructure.api.dtos.QuizResponseDto
+import training.quizTdd.infrastructure.api.exceptions.QuizNotFoundException
 
 @SpringBootTest
 class QuizControllerUnitTest extends Specification {
@@ -60,7 +61,7 @@ class QuizControllerUnitTest extends Specification {
         IQuizService quizService = new QuizService()
         and: 'a RestController for Quiz requests'
         QuizController controller = new QuizController(quizService)
-        and: 'a quiz to solve'
+        and: 'some quiz to solve'
         quizService.createQuiz("title", "text", List.of("option", "option2"), 0)
         int quizId = quizService.getQuizzes().get(0).getId()
         and: 'a positive answer object'
@@ -73,5 +74,24 @@ class QuizControllerUnitTest extends Specification {
 
         then: 'negative feedback is given'
         response == answerResponseDto
+    }
+
+    def 'answering a quiz that does not exists returns 404'() {
+        given: 'a service to process quizzes'
+        IQuizService quizService = new QuizService()
+        and: 'a RestController for Quiz requests'
+        QuizController controller = new QuizController(quizService)
+        and: 'some quiz to solve'
+        quizService.createQuiz("title", "text", List.of("option", "option2"), 0)
+        and: 'some QuizId'
+        def someQuizId = 1234567890
+
+        when: 'an answer to a non-existing quiz is given'
+        def response = controller.solveQuiz(someQuizId, 0)
+
+        then: 'a QuizNotFoundException is triggered'
+        thrown(QuizNotFoundException)
+
+
     }
 }

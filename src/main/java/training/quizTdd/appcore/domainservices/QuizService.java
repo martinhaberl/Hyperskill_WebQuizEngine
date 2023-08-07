@@ -3,6 +3,7 @@ package training.quizTdd.appcore.domainservices;
 import org.springframework.stereotype.Service;
 import training.quizTdd.appcore.domainmodel.Answer;
 import training.quizTdd.appcore.domainmodel.Quiz;
+import training.quizTdd.infrastructure.api.exceptions.QuizNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +30,9 @@ public class QuizService implements IQuizService {
     }
 
     @Override
-    public Quiz getQuiz(Integer id) {
-        Integer index = getIndex(id);
-        return quizzes.get(index);
+    public Quiz getQuiz(Integer quizId) {
+        Integer quizIndex = getIndex(quizId);
+        return quizzes.get(quizIndex);
     }
 
     @Override
@@ -44,12 +45,17 @@ public class QuizService implements IQuizService {
                 new Answer(false, "Wrong answer! Please, try again.");
     }
 
-    private Integer getIndex(Integer id) {
-        Integer index = -1;
+    private Integer getIndex(Integer quizId) {
+        Integer index = null;
+
         for (Quiz quiz : quizzes) {
-            if (Objects.equals(quiz.getId(), id)) {
+            if (Objects.equals(quiz.getId(), quizId)) {
                 index = quizzes.indexOf(quiz);
             }
+        }
+
+        if (index == null) {
+            throw new QuizNotFoundException("Quiz with id %d does not exist.".formatted(quizId));
         }
 
         return index;

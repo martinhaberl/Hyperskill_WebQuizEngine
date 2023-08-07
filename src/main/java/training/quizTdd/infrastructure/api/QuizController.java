@@ -8,13 +8,14 @@ import training.quizTdd.appcore.domainservices.IQuizService;
 import training.quizTdd.infrastructure.api.dtos.AnswerResponseDto;
 import training.quizTdd.infrastructure.api.dtos.QuizRequestDto;
 import training.quizTdd.infrastructure.api.dtos.QuizResponseDto;
+import training.quizTdd.infrastructure.api.exceptions.QuizNotFoundException;
 
 import java.util.List;
 
 @RestController
 public class QuizController {
 
-    private IQuizService quizService;
+    private final IQuizService quizService;
 
     @Autowired
     public QuizController(IQuizService quizService) {
@@ -29,8 +30,10 @@ public class QuizController {
     }
 
     @PostMapping("/api/quizzes/{id}/solve?answer={index}")
-    public AnswerResponseDto solveQuiz(@PathVariable Integer id, @RequestParam("answer") Integer answerOption) {
-        Answer answer = quizService.solveQuiz(id, answerOption);
+    public AnswerResponseDto solveQuiz(@PathVariable Integer id, @RequestParam("answer") Integer index) {
+        checkIfQuizIdExists(id);
+        Answer answer = quizService.solveQuiz(id, index);
+
         return new AnswerResponseDto(answer.success(), answer.feedback());
     }
 
@@ -41,9 +44,16 @@ public class QuizController {
 
     @GetMapping(path = "/api/quizzes/{id}")
     public QuizResponseDto getQuiz(@PathVariable Integer id) {
-
+        checkIfQuizIdExists(id);
         Quiz quiz = quizService.getQuiz(id);
+
         return new QuizResponseDto(quiz.getId(), quiz.getTitle(), quiz.getText(), quiz.getOptions());
+    }
+
+    private void checkIfQuizIdExists(Integer id) {
+        if (quizService.getQuiz(id) == null) {
+            throw new QuizNotFoundException("Quiz with id %d does not exist.".formatted(id));
+        }
     }
 
 }
