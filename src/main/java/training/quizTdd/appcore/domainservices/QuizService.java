@@ -45,7 +45,7 @@ public class QuizService implements IQuizService {
                 new Answer(false, "Wrong answer! Please, try again.");
     }
 
-    private Integer getIndex(Integer quizId) {
+    public Integer getIndex(Integer quizId) {
         Integer index = null;
 
         for (Quiz quiz : quizzes) {

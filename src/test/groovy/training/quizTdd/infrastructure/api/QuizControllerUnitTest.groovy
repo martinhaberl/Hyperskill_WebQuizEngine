@@ -91,7 +91,23 @@ class QuizControllerUnitTest extends Specification {
 
         then: 'a QuizNotFoundException is triggered'
         thrown(QuizNotFoundException)
-
-
     }
+
+    def 'answering a quiz returns 200'() {
+        given: 'a service to process quizzes'
+        IQuizService quizService = new QuizService()
+        and: 'a RestController for Quiz requests'
+        QuizController controller = new QuizController(quizService)
+        and: 'some quiz to solve'
+        quizService.createQuiz("title", "text", List.of("option", "option2"), 0)
+        and: 'some QuizId'
+        def someQuizId = 1234567890
+
+        when: 'an answer to a non-existing quiz is given'
+        def response = controller.solveQuiz(someQuizId, 0)
+
+        then: 'a QuizNotFoundException is triggered'
+        thrown(QuizNotFoundException)
+    }
+
 }
