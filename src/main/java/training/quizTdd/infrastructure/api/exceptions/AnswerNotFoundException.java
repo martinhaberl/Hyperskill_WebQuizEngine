@@ -1,11 +1,12 @@
 package training.quizTdd.infrastructure.api.exceptions;
 
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class QuizNotFoundException extends RuntimeException {
-    public QuizNotFoundException(String message) {
+public class AnswerNotFoundException extends RuntimeException {
+    public AnswerNotFoundException(String message) {
         super(message);
     }
 }

@@ -3,16 +3,16 @@ package training.quizTdd.appcore.domainservices;
 import org.springframework.stereotype.Service;
 import training.quizTdd.appcore.domainmodel.Answer;
 import training.quizTdd.appcore.domainmodel.Quiz;
-import training.quizTdd.infrastructure.api.exceptions.QuizNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class QuizService implements IQuizService {
 
-    List<Quiz> quizzes = new ArrayList<>();
+    private final List<Quiz> quizzes = new ArrayList<>();
 
     public QuizService() {
     }
@@ -30,19 +30,22 @@ public class QuizService implements IQuizService {
     }
 
     @Override
-    public Quiz getQuiz(Integer quizId) {
-        Integer quizIndex = getIndex(quizId);
-        return quizzes.get(quizIndex);
+    public Optional<Quiz> getQuiz(Integer quizId) {
+        return quizzes.stream().filter(quiz -> Objects.equals(quiz.getId(), quizId)).findFirst();
     }
 
     @Override
-    public Answer solveQuiz(Integer quizId, Integer optionNumber) {
-        Integer quizIndex = getIndex(quizId);
-        Quiz quiz = quizzes.get(quizIndex);
+    public Optional<Answer> solveQuiz(Integer quizId, Integer optionNumber) {
 
-        return quiz.getAnswer() == optionNumber ?
-                new Answer(true, "Congratulations, you're right!") :
-                new Answer(false, "Wrong answer! Please, try again.");
+        Optional<Quiz> quizOptional = getQuiz(quizId);
+
+        if (quizOptional.isPresent()) {
+            return Optional.of(quizOptional.get().getAnswer() == optionNumber ?
+                    new Answer(true, "Congratulations, you're right!") :
+                    new Answer(false, "Wrong answer! Please, try again."));
+        } else {
+            return Optional.of(new Answer(false, "-1"));
+        }
     }
 
     public Integer getIndex(Integer quizId) {
@@ -54,10 +57,7 @@ public class QuizService implements IQuizService {
             }
         }
 
-        if (index == null) {
-            throw new QuizNotFoundException("Quiz with id %d does not exist.".formatted(quizId));
-        }
-
         return index;
     }
+
 }

@@ -5,6 +5,7 @@ import training.quizTdd.appcore.domainmodel.Answer;
 import training.quizTdd.appcore.domainmodel.Quiz;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public interface IQuizService {
@@ -16,7 +17,7 @@ public interface IQuizService {
 
     List<Quiz> getQuizzes();
 
-    Quiz getQuiz(Integer id);
+    Optional<Quiz> getQuiz(Integer id);
 
-    Answer solveQuiz(Integer id, Integer optionNumber);
+    Optional<Answer> solveQuiz(Integer id, Integer optionNumber);
 }
