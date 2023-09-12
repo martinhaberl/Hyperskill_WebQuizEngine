@@ -48,16 +48,4 @@ public class QuizService implements IQuizService {
         }
     }
 
-    public Integer getIndex(Integer quizId) {
-        Integer index = null;
-
-        for (Quiz quiz : quizzes) {
-            if (Objects.equals(quiz.getId(), quizId)) {
-                index = quizzes.indexOf(quiz);
-            }
-        }
-
-        return index;
-    }
-
 }

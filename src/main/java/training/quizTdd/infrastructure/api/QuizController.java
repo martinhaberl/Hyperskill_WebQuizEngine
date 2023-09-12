@@ -4,7 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import training.quizTdd.appcore.domainmodel.Answer;
 import training.quizTdd.appcore.domainmodel.Quiz;
 import training.quizTdd.appcore.domainservices.IQuizService;
@@ -57,8 +62,8 @@ public class QuizController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping("/api/quizzes/{id}/solve?answer={index}")
-    public ResponseEntity<AnswerResponseDto> solveQuiz(@PathVariable("id") Integer id, @RequestParam("answer") Integer index) {
+    @PostMapping("/api/quizzes/{id}/solve")
+    public ResponseEntity<AnswerResponseDto> solveQuiz(@PathVariable("id") Integer id, @RequestParam("answer") int index) {
         Optional<Answer> answer = quizService.solveQuiz(id, index);
 
         if (answer.get().feedback().equals("-1")) {
@@ -69,6 +74,5 @@ public class QuizController {
 
         return ResponseEntity.ok().body(answerResponseDto);
     }
-
 
 }
