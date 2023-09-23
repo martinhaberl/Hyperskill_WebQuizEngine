@@ -1,6 +1,5 @@
 package training.quizTdd.appcore.domainmodel;
 
-import jakarta.validation.constraints.Size;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
@@ -12,7 +11,6 @@ public class Quiz {
     private Integer id;
     private String title;
     private String text;
-    @Size(min = 2)
     private List<String> options;
     private List<Integer> answer;
 

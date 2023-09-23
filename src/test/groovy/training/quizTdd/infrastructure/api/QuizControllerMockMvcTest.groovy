@@ -32,6 +32,7 @@ class QuizControllerMockMvcTest extends Specification {
 
         then: 'quiz is created'
         result.andReturn().response.status == 200
+        result.andExpect(MockMvcResultMatchers.jsonPath('$.id').isNotEmpty())
         result.andExpect(MockMvcResultMatchers.jsonPath('$.title').value("The Java Logo"))
         result.andExpect(MockMvcResultMatchers.jsonPath('$.text').value("What is depicted on the Java logo?"))
         result.andExpect(MockMvcResultMatchers.jsonPath('$.options').value(["Robot", "Tea leaf", "Cup of coffee", "Bug"]))
@@ -69,7 +70,7 @@ class QuizControllerMockMvcTest extends Specification {
         requestedQuiz.andExpect(MockMvcResultMatchers.jsonPath('$.title').value('The Apple Logo'))
     }
 
-    def "when creating a quiz, a missing title should return a bad-request-status"() {
+    def "when creating a quiz, a request without title should return a bad-request-status"() {
         given: 'a quiz without title as JSON string'
         def quizContentMissingTitle = '{\"text\": \"What is depicted on the Apple logo?\",\"options\": [\"Peach\", \"Drum\", \"Quokka\", \"Apple\"],\"answer\": [3]}'
 
@@ -80,7 +81,7 @@ class QuizControllerMockMvcTest extends Specification {
         result.andReturn().response.status == 400
     }
 
-    def "when creating a quiz, an empty title should return a bad-request-exception"() {
+    def "when creating a quiz, a request with an empty title should return a bad-request-exception"() {
         given: 'a quiz with empty title as JSON string'
         def quizContentEmptyTitle = '{\"title\": \"\",\"text\": \"What is depicted on the Apple logo?\",\"options\": [\"Peach\", \"Drum\", \"Quokka\", \"Apple\"],\"answer\": [3]}'
 
@@ -91,8 +92,8 @@ class QuizControllerMockMvcTest extends Specification {
         result.andReturn().response.status == 400
     }
 
-    def "when creating a quiz, missing answers should return a bad-request-exception"() {
-        given: 'a quiz with empty answer options as JSON string'
+    def "when creating a quiz, a request without answer-options should return a bad-request-exception"() {
+        given: 'a quiz with empty answer-options as JSON string'
         def quizContentEmptyOptions = '{\\"title\\": \\"The Apple Logo\\",\\"text\\": \\"What is depicted on the Apple logo?\\",\\"options\\": [],\\"answer\\": [3]}'
 
         when: 'a request is sent to create a quiz'
@@ -100,6 +101,21 @@ class QuizControllerMockMvcTest extends Specification {
 
         then: 'bad-request-status is returned'
         result.andReturn().response.status == 400
+    }
+
+    def "when creating a quiz, a request without answers should return a valid quiz"() {
+        given: 'a quiz without answers as JSON string'
+        def quizContentNoAnswers = '{\"title\":\"The Apple Logo\",\"text\":\"What is depicted on the Apple logo?\",\"options\":[\"Peach\",\"Drum\",\"Quokka\",\"Bumblebee\"]}'
+
+        when: 'a request is sent to create a quiz'
+        def result = createQuiz(quizContentNoAnswers)
+
+        then: 'valid quiz is returned'
+        result.andReturn().response.status == 200
+        result.andExpect(MockMvcResultMatchers.jsonPath('$.id').isNotEmpty())
+        result.andExpect(MockMvcResultMatchers.jsonPath('$.title').value("The Apple Logo"))
+        result.andExpect(MockMvcResultMatchers.jsonPath('$.text').value("What is depicted on the Apple logo?"))
+        result.andExpect(MockMvcResultMatchers.jsonPath('$.options').value(["Peach", "Drum", "Quokka", "Bumblebee"]))
     }
 
     @Unroll

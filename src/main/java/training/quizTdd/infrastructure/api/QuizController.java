@@ -2,6 +2,7 @@ package training.quizTdd.infrastructure.api;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -36,10 +37,13 @@ public class QuizController {
 
     @PostMapping("/api/quizzes")
     public ResponseEntity<QuizResponseDto> createQuiz(@RequestBody @Valid QuizRequestDto quizRequestDto) {
+        final List<Integer> answerInput = quizRequestDto.answer() == null ||
+                quizRequestDto.answer().isEmpty() ? List.of() : quizRequestDto.answer();
+
         Quiz quiz = quizService.createQuiz(quizRequestDto.title(),
                 quizRequestDto.text(),
                 quizRequestDto.options(),
-                quizRequestDto.answer());
+                answerInput);
         QuizResponseDto quizResponseDto = new QuizResponseDto(quiz.getId(),
                 quiz.getTitle(),
                 quiz.getQuestion(),
@@ -76,8 +80,8 @@ public class QuizController {
     }
 
     @PostMapping("/api/quizzes/{id}/solve")
-    public ResponseEntity<AnswerResponseDto> solveQuiz(@PathVariable("id") @Min(0) int id,
-                                                       @RequestParam("answer") @Min(0) int index) {
+    public ResponseEntity<AnswerResponseDto> solveQuiz(@PathVariable("id") @NotNull @Min(0) int id,
+                                                       @RequestParam("answer") @NotNull @Min(0) int index) {
         Optional<Answer> answer = quizService.solveQuiz(id, index);
 
         if (answer.get().feedback().equals("-1")) {
