@@ -1,17 +1,15 @@
 package training.quizTdd.appcore.domainservices
 
-
 import spock.lang.Specification
 import spock.lang.Unroll
 import training.quizTdd.appcore.domainmodel.Answer
-import training.quizTdd.appcore.domainmodel.Quiz
 
 class QuizServiceTest extends Specification {
 
     @Unroll
     def 'should create a Quiz and store it'() {
         given: 'a QuizService'
-        IQuizService quizService = new QuizService();
+        IQuizService quizService = new QuizService()
 
         when: 'a quiz is created'
         def quiz = quizService.createQuiz(title, question, options, answer)
@@ -38,11 +36,10 @@ class QuizServiceTest extends Specification {
 
     def "should return all stored quizzes"() {
         given: 'a quiz service'
-        IQuizService quizService = new QuizService();
-        and: 'first quiz'
-        Quiz quiz1 = quizService.createQuiz('title1', 'question', ['option'], [0])
-        and: 'second quiz'
-        Quiz quiz2 = quizService.createQuiz('title2', 'question2', ['option1'], [2])
+        IQuizService quizService = new QuizService()
+        and: '2 quizzes'
+        quizService.createQuiz('title1', 'question', ['option'], [0])
+        quizService.createQuiz('title2', 'question2', ['option1'], [2])
 
         when: 'stored quizzes are requested'
         def quizzes = quizService.getQuizzes()
@@ -55,9 +52,9 @@ class QuizServiceTest extends Specification {
 
     def 'should return specific quiz by id'() {
         given: 'a quiz service'
-        IQuizService quizService = new QuizService();
+        IQuizService quizService = new QuizService()
         and: 'a quiz'
-        Quiz quiz1 = quizService.createQuiz('title1', 'question', ['option'], [0])
+        quizService.createQuiz('title1', 'question', ['option'], [0])
         and: 'a generated quizId'
         def quizId = quizService.getQuizzes().get(0).getId()
 

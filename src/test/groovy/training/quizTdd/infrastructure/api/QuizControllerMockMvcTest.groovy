@@ -129,8 +129,6 @@ class QuizControllerMockMvcTest extends Specification {
         given: 'a quiz'
         def quiz = createQuiz(quizBContentJSON)
         Quiz createdQuiz = objectMapper.readValue(quiz.andReturn().getResponse().getContentAsString(), Quiz.class)
-        and: 'id of created quiz'
-        def createdId = createdQuiz.getId()
 
         when: 'wrong answer is given'
         def result = solveQuiz(createdQuiz.getId(), wrongAnswer)

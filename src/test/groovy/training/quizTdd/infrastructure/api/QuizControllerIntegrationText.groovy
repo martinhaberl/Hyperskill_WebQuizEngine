@@ -92,7 +92,7 @@ class QuizControllerIntegrationText extends Specification {
         and: '1 quiz'
         controller.createQuiz(quizRequestDto)
         and: 'an invalid id of created quiz'
-        def quizId = 1234567890;
+        def quizId = 1234567890
 
         when: 'quiz is requested by invalid id'
         controller.getQuiz(quizId)
