@@ -13,7 +13,7 @@ public interface IQuizService {
     Quiz createQuiz(String title,
                     String text,
                     List<String> options,
-                    Integer answer);
+                    List<Integer> answer);
 
     List<Quiz> getQuizzes();
 

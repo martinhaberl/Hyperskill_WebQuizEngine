@@ -1,25 +1,25 @@
 package training.quizTdd.appcore.domainmodel;
 
+import jakarta.validation.constraints.Size;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
 import java.util.List;
+
 
 @Component
 public class Quiz {
     private Integer id;
     private String title;
     private String text;
+    @Size(min = 2)
     private List<String> options;
-    private int answer;
+    private List<Integer> answer;
 
     public Quiz() {
     }
 
-    public Quiz(String title,
-                String text,
-                List<String> options,
-                int answer) {
+    public Quiz(String title, String text, List<String> options, List<Integer> answer) {
         this.id = this.setId();
         this.title = title;
         this.text = text;
@@ -35,7 +35,7 @@ public class Quiz {
         return title;
     }
 
-    public String getText() {
+    public String getQuestion() {
         return text;
     }
 
@@ -43,7 +43,7 @@ public class Quiz {
         return options;
     }
 
-    public int getAnswer() {
+    public List<Integer> getAnswer() {
         return answer;
     }
 

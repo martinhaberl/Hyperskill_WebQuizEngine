@@ -18,7 +18,7 @@ public class QuizService implements IQuizService {
     }
 
     @Override
-    public Quiz createQuiz(String title, String text, List<String> options, Integer answer) {
+    public Quiz createQuiz(String title, String text, List<String> options, List<Integer> answer) {
         Quiz quiz = new Quiz(title, text, options, answer);
         quizzes.add(quiz);
         return quiz;
@@ -40,7 +40,7 @@ public class QuizService implements IQuizService {
         Optional<Quiz> quizOptional = getQuiz(quizId);
 
         if (quizOptional.isPresent()) {
-            return Optional.of(quizOptional.get().getAnswer() == optionNumber ?
+            return Optional.of(quizOptional.get().getAnswer().contains(optionNumber) ?
                     new Answer(true, "Congratulations, you're right!") :
                     new Answer(false, "Wrong answer! Please, try again."));
         } else {

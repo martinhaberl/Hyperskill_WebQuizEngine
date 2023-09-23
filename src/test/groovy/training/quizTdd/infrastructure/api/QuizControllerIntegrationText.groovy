@@ -14,7 +14,7 @@ class QuizControllerIntegrationText extends Specification {
     def title = 'someTitle'
     def text = 'someText'
     def options = ['option1', 'option2', 'option3', 'option4']
-    def answer = 1
+    def answer = [1]
 
     def 'a post request creates a new Quiz and returns it'() {
         given: 'some values for a quiz'
@@ -108,7 +108,7 @@ class QuizControllerIntegrationText extends Specification {
         and: 'a RestController for Quiz requests'
         QuizController controller = new QuizController(quizService)
         and: 'a quiz to solve'
-        quizService.createQuiz("title", "text", List.of("option", "option2"), 0)
+        quizService.createQuiz("title", "text", List.of("option", "option2"), [0])
         int quizId = quizService.getQuizzes().get(0).getId()
         and: 'a positive answer object'
         AnswerResponseDto answerResponseDto = new AnswerResponseDto(
@@ -129,7 +129,7 @@ class QuizControllerIntegrationText extends Specification {
         and: 'a RestController for Quiz requests'
         QuizController controller = new QuizController(quizService)
         and: 'some quiz to solve'
-        quizService.createQuiz("title", "text", List.of("option", "option2"), 0)
+        quizService.createQuiz("title", "text", List.of("option", "option2"), [0])
         int quizId = quizService.getQuizzes().get(0).getId()
         and: 'a positive answer object'
         AnswerResponseDto answerResponseDto = new AnswerResponseDto(
@@ -150,7 +150,7 @@ class QuizControllerIntegrationText extends Specification {
         and: 'a RestController for Quiz requests'
         QuizController controller = new QuizController(quizService)
         and: 'some quiz to solve'
-        quizService.createQuiz("title", "text", List.of("option", "option2"), 0)
+        quizService.createQuiz("title", "text", List.of("option", "option2"), [0])
         and: 'some QuizId'
         def someQuizId = 1234567890
 
@@ -160,6 +160,5 @@ class QuizControllerIntegrationText extends Specification {
         then: 'a QuizNotFoundException is triggered'
         thrown(QuizNotFoundException)
     }
-
 
 }
