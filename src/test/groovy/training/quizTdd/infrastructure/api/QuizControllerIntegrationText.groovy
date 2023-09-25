@@ -5,6 +5,7 @@ import spock.lang.Specification
 import training.quizTdd.appcore.domainservices.IQuizService
 import training.quizTdd.appcore.domainservices.QuizService
 import training.quizTdd.infrastructure.api.dtos.AnswerResponseDto
+import training.quizTdd.infrastructure.api.dtos.AnswersRequestDto
 import training.quizTdd.infrastructure.api.dtos.QuizRequestDto
 import training.quizTdd.infrastructure.api.exceptions.QuizNotFoundException
 
@@ -108,15 +109,17 @@ class QuizControllerIntegrationText extends Specification {
         and: 'a RestController for Quiz requests'
         QuizController controller = new QuizController(quizService)
         and: 'a quiz to solve'
-        quizService.createQuiz("title", "text", List.of("option", "option2"), [0])
+        quizService.createQuiz("title", "text", List.of("option", "option2"), [0, 1])
         int quizId = quizService.getQuizzes().get(0).getId()
+        and: 'a request with 2 correct answers'
+        AnswersRequestDto answersRequestDto = new AnswersRequestDto(List.of(0, 1))
         and: 'a positive answer object'
         AnswerResponseDto answerResponseDto = new AnswerResponseDto(
                 true, 'Congratulations, you\'re right!'
         )
 
         when: 'correct answer is given'
-        def response = controller.solveQuiz(quizId, 0)
+        def response = controller.solveQuiz(quizId, answersRequestDto)
 
         then: 'positive feedback is given'
         response.getStatusCode().value() == 200
@@ -131,13 +134,15 @@ class QuizControllerIntegrationText extends Specification {
         and: 'some quiz to solve'
         quizService.createQuiz("title", "text", List.of("option", "option2"), [0])
         int quizId = quizService.getQuizzes().get(0).getId()
-        and: 'a positive answer object'
+        and: 'a request with 2 wrong answers'
+        AnswersRequestDto answersRequestDto = new AnswersRequestDto(List.of(777, 666))
+        and: 'a negative answer object'
         AnswerResponseDto answerResponseDto = new AnswerResponseDto(
                 false, 'Wrong answer! Please, try again.'
         )
 
         when: 'correct answer is given'
-        def response = controller.solveQuiz(quizId, 2)
+        def response = controller.solveQuiz(quizId, answersRequestDto)
 
         then: 'negative feedback is given'
         response.getStatusCode().value() == 200
@@ -149,13 +154,13 @@ class QuizControllerIntegrationText extends Specification {
         IQuizService quizService = new QuizService()
         and: 'a RestController for Quiz requests'
         QuizController controller = new QuizController(quizService)
-        and: 'some quiz to solve'
-        quizService.createQuiz("title", "text", List.of("option", "option2"), [0])
+        and: 'some request with an answer'
+        AnswersRequestDto answersRequestDto = new AnswersRequestDto(List.of())
         and: 'some QuizId'
         def someQuizId = 1234567890
 
         when: 'an answer to a non-existing quiz is given'
-        controller.solveQuiz(someQuizId, 0)
+        controller.solveQuiz(someQuizId, answersRequestDto)
 
         then: 'a QuizNotFoundException is triggered'
         thrown(QuizNotFoundException)

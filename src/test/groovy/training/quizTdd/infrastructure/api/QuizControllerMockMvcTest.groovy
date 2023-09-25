@@ -6,7 +6,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spock.lang.Specification
@@ -92,12 +91,45 @@ class QuizControllerMockMvcTest extends Specification {
         result.andReturn().response.status == 400
     }
 
+    def "when creating a quiz, a request without question should return a bad-request-exception"() {
+        given: 'a quiz without question as JSON string'
+        def quizContentWithoutQuestion = '{\"title\": \"The Apple Logo\",\"options\": [\"Peach\", \"Drum\", \"Quokka\", \"Apple\"],\"answer\": [2, 3]}'
+
+        when: 'a request is sent to create a quiz'
+        def result = createQuiz(quizContentWithoutQuestion)
+
+        then: 'bad-request-status is returned'
+        result.andReturn().response.status == 400
+    }
+
+    def "when creating a quiz, a request with an empty question should return a bad-request-exception"() {
+        given: 'a quiz with empty question as JSON string'
+        def quizContentEmptyQuestion = '{\"title\": \"\",\"text\": \"\",\"options\": [\"Peach\", \"Drum\", \"Quokka\", \"Apple\"],\"answer\": [3]}'
+
+        when: 'a request is sent to create a quiz'
+        def result = createQuiz(quizContentEmptyQuestion)
+
+        then: 'bad-request-status is returned'
+        result.andReturn().response.status == 400
+    }
+
     def "when creating a quiz, a request without answer-options should return a bad-request-exception"() {
         given: 'a quiz with empty answer-options as JSON string'
         def quizContentEmptyOptions = '{\\"title\\": \\"The Apple Logo\\",\\"text\\": \\"What is depicted on the Apple logo?\\",\\"options\\": [],\\"answer\\": [3]}'
 
         when: 'a request is sent to create a quiz'
         def result = createQuiz(quizContentEmptyOptions)
+
+        then: 'bad-request-status is returned'
+        result.andReturn().response.status == 400
+    }
+
+    def "when creating a quiz, a request with less than 2 answer-options should return a bad-request-exception"() {
+        given: 'a quiz with only 1 answer-option as JSON string'
+        def quizContentTooFewOptions = '{\\"title\\": \\"The Apple Logo\\",\\"text\\": \\"What is depicted on the Apple logo?\\",\\"options\\": [\"Quokka\"],\\"answer\\": [3]}'
+
+        when: 'a request is sent to create a quiz'
+        def result = createQuiz(quizContentTooFewOptions)
 
         then: 'bad-request-status is returned'
         result.andReturn().response.status == 400
@@ -121,13 +153,15 @@ class QuizControllerMockMvcTest extends Specification {
     @Unroll
     def "solving an existing quiz with a correct answer should return a positive feedback"() {
         given: 'a quiz with 2 correct answers'
-        def quizWith2correctAnswers = createQuiz(quizBContentJSON)
+        def quizWith2correctAnswersAsJson = createQuiz(quizBContentJSON).andReturn()
+                .getResponse()
+                .getContentAsString()
         and: 'created quiz as quiz object'
-        def twoAnswerQuiz = objectMapper.readValue(quizWith2correctAnswers.andReturn().getResponse().getContentAsString(), Quiz.class)
-        def twoAnswerQuizId = twoAnswerQuiz.id
+        def createdQuizWith2CorrectAnswers = objectMapper.readValue(quizWith2correctAnswersAsJson, Quiz.class)
 
         when: 'a correct answer is given'
-        def result = solveQuiz(twoAnswerQuizId, answer)
+        def correctAnswersJson = '{ \"answer\": %s }'.formatted(correctAnswer)
+        def result = solveQuiz(createdQuizWith2CorrectAnswers.id, correctAnswersJson)
 
         then: 'a positive feedback is returned'
         result.andReturn().response.status == 200
@@ -135,37 +169,16 @@ class QuizControllerMockMvcTest extends Specification {
         result.andExpect(MockMvcResultMatchers.jsonPath('$.feedback').value('Congratulations, you\'re right!'))
 
         where:
-        answer | _
-        2      | _
-        3      | _
-    }
-
-    @Unroll
-    def "solving an existing quiz with a wrong answer should returns a negative feedback"() {
-        given: 'a quiz'
-        def quiz = createQuiz(quizBContentJSON)
-        Quiz createdQuiz = objectMapper.readValue(quiz.andReturn().getResponse().getContentAsString(), Quiz.class)
-
-        when: 'wrong answer is given'
-        def result = solveQuiz(createdQuiz.getId(), wrongAnswer)
-
-        then: 'negative feedback is returned'
-        result.andReturn().response.status == 200
-        result.andExpect(MockMvcResultMatchers.jsonPath('$.success').value(false))
-        result.andExpect(MockMvcResultMatchers.jsonPath('$.feedback').value('Wrong answer! Please, try again.'))
-
-        where:
-        wrongAnswer | _
-        1234        | _
-        4321        | _
-        4711        | _
-        11          | _
+        correctAnswer | _
+        '[2]'         | _
+        '[3]'         | _
+        '[2,3]'       | _
     }
 
     @Unroll
     def "solving a non-existing quiz should return a not-found-status"() {
         when: 'an invalid quizId is received'
-        def result = solveQuiz(quizId, 0)
+        def result = solveQuiz(quizId, '{ \"answer\": [0,1]}')
 
         then: 'a not-found-status is returned'
         result.andReturn().response.status == 404
@@ -178,9 +191,57 @@ class QuizControllerMockMvcTest extends Specification {
         96315  | _
     }
 
-    private ResultActions solveQuiz(int quizId, int answerIndex) {
-        def url = '/api/quizzes/' + quizId + '/solve?answer=' + answerIndex
-        return mvc.perform(MockMvcRequestBuilders.post(url))
+    @Unroll
+    def "solving an existing quiz with a wrong answer should return a negative feedback"() {
+        given: 'a quiz'
+        def quizAsString = createQuiz(quizBContentJSON).andReturn()
+                .getResponse().getContentAsString()
+        Quiz createdQuiz = objectMapper.readValue(quizAsString, Quiz.class)
+
+        when: 'wrong answer is sent'
+        def wrongAnswersJson = '{ \"answer\": %s }'.formatted(wrongAnswer)
+        def result = solveQuiz(createdQuiz.getId(), wrongAnswersJson)
+
+        then: 'negative feedback is returned'
+        result.andReturn().response.status == 200
+        result.andExpect(MockMvcResultMatchers.jsonPath('$.success')
+                .value(false))
+        result.andExpect(MockMvcResultMatchers.jsonPath('$.feedback')
+                .value('Wrong answer! Please, try again.'))
+
+        where:
+        wrongAnswer | _
+        [1234]      | _
+        [4321, 34]  | _
+        [4711]      | _
+        [11]        | _
+    }
+
+    def "solving an existing quiz without answers should return a positive feedback"() {
+        given: 'a quiz without answers'
+        def quizContentNoAnswers = '{\"title\":\"The Apple Logo\",\"text\":\"What is depicted on the Apple logo?\",\"options\":[\"Peach\",\"Drum\",\"Quokka\",\"Bumblebee\"]}'
+        def quizAsString = createQuiz(quizContentNoAnswers).andReturn()
+                .getResponse().getContentAsString()
+        Quiz createdQuiz = objectMapper.readValue(quizAsString, Quiz.class)
+
+        when: 'correct empty answer is sent'
+        def emptyAnswersJson = '{ \"answer\": [] }'
+        def result = solveQuiz(createdQuiz.getId(), emptyAnswersJson)
+
+        then: 'positive feedback is returned'
+        result.andReturn().response.status == 200
+        result.andExpect(MockMvcResultMatchers.jsonPath('$.success')
+                .value(true))
+        result.andExpect(MockMvcResultMatchers.jsonPath('$.feedback')
+                .value('Congratulations, you\'re right!'))
+    }
+
+    private solveQuiz(int quizId, String answersJson) {
+        def url = '/api/quizzes/%d/solve'.formatted(quizId)
+        mvc.perform(MockMvcRequestBuilders
+                .post(url)
+                .content(answersJson)
+                .contentType(MediaType.APPLICATION_JSON))
     }
 
     private createQuiz(String quizRequestJson) {

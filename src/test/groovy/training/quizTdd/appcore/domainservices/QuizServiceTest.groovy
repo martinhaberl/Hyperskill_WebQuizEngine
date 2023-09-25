@@ -16,7 +16,7 @@ class QuizServiceTest extends Specification {
 
         then: 'a quiz instance is returned'
         quiz.getTitle() == title
-        quiz.getQuestion() == question
+        quiz.getText() == question
         quiz.getOptions() == options
         quiz.getAnswer() == answer
         and: 'Quiz is stored in Collection'
@@ -86,11 +86,11 @@ class QuizServiceTest extends Specification {
 
         where:
         quizIndex | answerGiven
-        0         | 1
-        1         | 0
-        1         | 2
-        2         | 3
-        2         | 1
+        0         | [1]
+        1         | [0, 2]
+        1         | [2]
+        2         | [3]
+        2         | [1]
     }
 
     def "wrong answer returns negative feedback"() {
@@ -111,10 +111,9 @@ class QuizServiceTest extends Specification {
 
         where:
         quizIndex | answerGiven
-        0         | 2
-        1         | 11156
-        2         | -234213
-
+        0         | [2]
+        1         | [11156]
+        2         | [-234213]
     }
 
 }

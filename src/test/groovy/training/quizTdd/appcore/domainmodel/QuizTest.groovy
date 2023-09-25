@@ -18,7 +18,7 @@ class QuizTest extends Specification {
 
         then: 'instance attributes are equal to given parameter values'
         instance.getTitle() == title
-        instance.getQuestion() == text
+        instance.getText() == text
         instance.getOptions() == options
         instance.getAnswer() == answer
         instance.getAnswer()[1] == answer[1]

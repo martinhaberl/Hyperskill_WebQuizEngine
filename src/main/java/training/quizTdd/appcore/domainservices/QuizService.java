@@ -35,12 +35,22 @@ public class QuizService implements IQuizService {
     }
 
     @Override
-    public Optional<Answer> solveQuiz(Integer quizId, Integer optionNumber) {
+    public Optional<Answer> solveQuiz(Integer quizId, List<Integer> givenAnswers) {
 
         Optional<Quiz> quizOptional = getQuiz(quizId);
 
-        if (quizOptional.isPresent()) {
-            return Optional.of(quizOptional.get().getAnswer().contains(optionNumber) ?
+        if (quizOptional.isPresent() && givenAnswers != null) {
+            boolean storedAnswersAndGivenAnswersAreBothCorrectlyEmpty =
+                    quizOptional.get().getAnswer().size() == 0 && givenAnswers.size() == 0;
+
+            boolean storedAnswersContainGivenAnswers =
+                    givenAnswers.stream().anyMatch(integer ->
+                            quizOptional.get()
+                                    .getAnswer()
+                                    .contains(integer)
+                    );
+
+            return Optional.of(storedAnswersAndGivenAnswersAreBothCorrectlyEmpty || storedAnswersContainGivenAnswers ?
                     new Answer(true, "Congratulations, you're right!") :
                     new Answer(false, "Wrong answer! Please, try again."));
         } else {

@@ -19,5 +19,6 @@ public interface IQuizService {
 
     Optional<Quiz> getQuiz(Integer id);
 
-    Optional<Answer> solveQuiz(Integer id, Integer optionNumber);
+    Optional<Answer> solveQuiz(Integer id,
+                               List<Integer> answers);
 }

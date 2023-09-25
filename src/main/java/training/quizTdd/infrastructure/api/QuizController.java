@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import training.quizTdd.appcore.domainmodel.Answer;
 import training.quizTdd.appcore.domainmodel.Quiz;
 import training.quizTdd.appcore.domainservices.IQuizService;
 import training.quizTdd.appcore.domainservices.QuizService;
 import training.quizTdd.infrastructure.api.dtos.AnswerResponseDto;
+import training.quizTdd.infrastructure.api.dtos.AnswersRequestDto;
 import training.quizTdd.infrastructure.api.dtos.QuizRequestDto;
 import training.quizTdd.infrastructure.api.dtos.QuizResponseDto;
 import training.quizTdd.infrastructure.api.exceptions.QuizNotFoundException;
@@ -46,7 +46,7 @@ public class QuizController {
                 answerInput);
         QuizResponseDto quizResponseDto = new QuizResponseDto(quiz.getId(),
                 quiz.getTitle(),
-                quiz.getQuestion(),
+                quiz.getText(),
                 quiz.getOptions());
 
         return ResponseEntity.ok().body(quizResponseDto);
@@ -57,7 +57,7 @@ public class QuizController {
         List<QuizResponseDto> quizResponseDtos = quizService.getQuizzes().stream()
                 .map(quiz -> new QuizResponseDto(quiz.getId(),
                         quiz.getTitle(),
-                        quiz.getQuestion(),
+                        quiz.getText(),
                         quiz.getOptions())).toList();
 
         return ResponseEntity.ok().body(quizResponseDtos);
@@ -73,22 +73,24 @@ public class QuizController {
 
         QuizResponseDto quizResponseDto = new QuizResponseDto(quiz.get().getId(),
                 quiz.get().getTitle(),
-                quiz.get().getQuestion(),
+                quiz.get().getText(),
                 quiz.get().getOptions());
 
         return ResponseEntity.ok().body(quizResponseDto);
     }
 
     @PostMapping("/api/quizzes/{id}/solve")
-    public ResponseEntity<AnswerResponseDto> solveQuiz(@PathVariable("id") @NotNull @Min(0) int id,
-                                                       @RequestParam("answer") @NotNull @Min(0) int index) {
-        Optional<Answer> answer = quizService.solveQuiz(id, index);
+    public ResponseEntity<AnswerResponseDto> solveQuiz(@PathVariable("id") @NotNull @Min(0) int quizId,
+                                                       @RequestBody AnswersRequestDto answersRequestDto) {
+
+        Optional<Answer> answer = quizService.solveQuiz(quizId, answersRequestDto.answer());
 
         if (answer.get().feedback().equals("-1")) {
-            throw new QuizNotFoundException("Quiz with id %d does not exist.".formatted(id));
+            throw new QuizNotFoundException("Quiz with id %d does not exist.".formatted(quizId));
         }
 
-        AnswerResponseDto answerResponseDto = new AnswerResponseDto(answer.get().success(), answer.get().feedback());
+        AnswerResponseDto answerResponseDto = new AnswerResponseDto(answer.get().success(),
+                answer.get().feedback());
 
         return ResponseEntity.ok().body(answerResponseDto);
     }

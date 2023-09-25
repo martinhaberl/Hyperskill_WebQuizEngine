@@ -33,7 +33,7 @@ public class Quiz {
         return title;
     }
 
-    public String getQuestion() {
+    public String getText() {
         return text;
     }
 
