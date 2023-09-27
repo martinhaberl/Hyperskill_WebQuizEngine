@@ -5,6 +5,7 @@ import training.quizTdd.appcore.domainmodel.Answer;
 import training.quizTdd.appcore.domainmodel.Quiz;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,23 +40,43 @@ public class QuizService implements IQuizService {
 
         Optional<Quiz> quizOptional = getQuiz(quizId);
 
-        if (quizOptional.isPresent() && givenAnswers != null) {
-            boolean storedAnswersAndGivenAnswersAreBothCorrectlyEmpty =
-                    quizOptional.get().getAnswer().size() == 0 && givenAnswers.size() == 0;
-
-            boolean storedAnswersContainGivenAnswers =
-                    givenAnswers.stream().anyMatch(integer ->
-                            quizOptional.get()
-                                    .getAnswer()
-                                    .contains(integer)
-                    );
-
-            return Optional.of(storedAnswersAndGivenAnswersAreBothCorrectlyEmpty || storedAnswersContainGivenAnswers ?
-                    new Answer(true, "Congratulations, you're right!") :
-                    new Answer(false, "Wrong answer! Please, try again."));
-        } else {
-            return Optional.of(new Answer(false, "-1"));
+        if (quizOptional.isEmpty()) {
+            return Optional.of(getQuizDoesNotExistAnswer());
         }
+
+        if (quizOptional.isPresent()) {
+
+            ArrayList<Integer> sortableGivenAnswers = new ArrayList<>(givenAnswers);
+            ArrayList<Integer> sortableStoredAnwers = new ArrayList<>(quizOptional.get().getAnswer());
+
+            if (quizOptional.get().getAnswer().size() != givenAnswers.size()) {
+                return Optional.of(getNegativeAnswer());
+            }
+
+
+            if (givenAnswers.size() > 1) {
+                Collections.sort(sortableGivenAnswers);
+                Collections.sort(sortableStoredAnwers);
+            }
+
+            if (Objects.equals(sortableGivenAnswers, sortableStoredAnwers)) {
+                return Optional.of(getPositiveAnswer());
+            } else {
+                return Optional.of(getNegativeAnswer());
+            }
+        }
+        return Optional.of(new Answer(false, "den Fall habe ich wohl noch  nicht betrachtet"));
     }
 
+    private Answer getPositiveAnswer() {
+        return new Answer(true, "Congratulations, you're right!");
+    }
+
+    private Answer getNegativeAnswer() {
+        return new Answer(false, "Wrong answer! Please, try again.");
+    }
+
+    private Answer getQuizDoesNotExistAnswer() {
+        return new Answer(false, "Quiz does not exist.");
+    }
 }

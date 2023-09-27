@@ -73,9 +73,11 @@ class QuizServiceTest extends Specification {
         IQuizService quizService = new QuizService()
         and: 'some quizzes'
         quizService.createQuiz("quiz1", "question1", List.of("a", "b", "c"), List.of(1))
-        quizService.createQuiz("quiz2", "question2", List.of("a", "b", "c"), List.of(0, 2))
+        quizService.createQuiz("quiz2", "question2", List.of("a", "b", "c"), List.of(1, 0, 2))
         quizService.createQuiz("quiz3", "question3", List.of("a", "b", "c"), List.of(3, 1))
-        and: 'id of first quiz in collection'
+        quizService.createQuiz("quiz4", "question4", List.of("a", "b", "c"), List.of())
+        quizService.createQuiz("quiz5", "question5", List.of("a", "b", "c"), List.of(0, 1, 3))
+        and: 'id of quiz in collection'
         def quizId = quizService.getQuizzes().get(quizIndex).getId()
 
         when: 'an answer is given to solve the quiz'
@@ -87,10 +89,10 @@ class QuizServiceTest extends Specification {
         where:
         quizIndex | answerGiven
         0         | [1]
-        1         | [0, 2]
-        1         | [2]
-        2         | [3]
-        2         | [1]
+        1         | [0, 1, 2]
+        2         | [1, 3]
+        3         | []
+        4         | [0, 1, 3]
     }
 
     def "wrong answer returns negative feedback"() {
@@ -100,7 +102,9 @@ class QuizServiceTest extends Specification {
         quizService.createQuiz("quiz1", "question1", List.of("a", "b", "c"), List.of(1))
         quizService.createQuiz("quiz2", "question2", List.of("a", "b", "c"), List.of(0, 2))
         quizService.createQuiz("quiz3", "question3", List.of("a", "b", "c"), List.of(3, 1))
-        and: 'id of first quiz in collection'
+        quizService.createQuiz("quiz4", "question4", List.of("a", "b", "c"), List.of(2))
+        quizService.createQuiz("quiz5", "question5", List.of("a", "b", "c"), List.of())
+        and: 'id of quiz in collection'
         def quizId = quizService.getQuizzes().get(quizIndex).getId()
 
         when: 'an answer is given to solve the quiz'
@@ -114,6 +118,8 @@ class QuizServiceTest extends Specification {
         0         | [2]
         1         | [11156]
         2         | [-234213]
+        3         | []
+        4         | [2]
     }
 
 }

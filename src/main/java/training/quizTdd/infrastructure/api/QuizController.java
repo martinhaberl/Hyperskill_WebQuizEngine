@@ -85,7 +85,7 @@ public class QuizController {
 
         Optional<Answer> answer = quizService.solveQuiz(quizId, answersRequestDto.answer());
 
-        if (answer.get().feedback().equals("-1")) {
+        if (answer.get().feedback().equals("Quiz does not exist.")) {
             throw new QuizNotFoundException("Quiz with id %d does not exist.".formatted(quizId));
         }
 
@@ -94,5 +94,4 @@ public class QuizController {
 
         return ResponseEntity.ok().body(answerResponseDto);
     }
-
 }
