@@ -44,7 +44,7 @@ public class QuizController {
                 quizRequestDto.text(),
                 quizRequestDto.options(),
                 answerInput);
-        QuizResponseDto quizResponseDto = new QuizResponseDto(quiz.getId(),
+        QuizResponseDto quizResponseDto = new QuizResponseDto(quiz.getId().toString(),
                 quiz.getTitle(),
                 quiz.getText(),
                 quiz.getOptions());
@@ -55,7 +55,7 @@ public class QuizController {
     @GetMapping("/api/quizzes")
     public ResponseEntity<List<QuizResponseDto>> getAllQuizzes() {
         List<QuizResponseDto> quizResponseDtos = quizService.getQuizzes().stream()
-                .map(quiz -> new QuizResponseDto(quiz.getId(),
+                .map(quiz -> new QuizResponseDto(quiz.getId().toString(),
                         quiz.getTitle(),
                         quiz.getText(),
                         quiz.getOptions())).toList();
@@ -71,7 +71,7 @@ public class QuizController {
             throw new QuizNotFoundException("Quiz with id %d does not exist.".formatted(id));
         }
 
-        QuizResponseDto quizResponseDto = new QuizResponseDto(quiz.get().getId(),
+        QuizResponseDto quizResponseDto = new QuizResponseDto(quiz.get().getId().toString(),
                 quiz.get().getTitle(),
                 quiz.get().getText(),
                 quiz.get().getOptions());

@@ -1,51 +1,42 @@
 package training.quizTdd.appcore.domainmodel;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.security.SecureRandom;
 import java.util.List;
+import java.util.UUID;
 
 
 @Component
+@NoArgsConstructor
+@Getter
 public class Quiz {
-    private Integer id;
+    private UUID id;
     private String title;
     private String text;
     private List<String> options;
     private List<Integer> answer;
 
-    public Quiz() {
-    }
-
-    public Quiz(String title, String text, List<String> options, List<Integer> answer) {
-        this.id = this.setId();
+    public Quiz(final String title,
+                final String text,
+                final List<String> options,
+                final List<Integer> answer) {
         this.title = title;
         this.text = text;
         this.options = options;
         this.answer = answer;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public List<String> getOptions() {
-        return options;
-    }
-
-    public List<Integer> getAnswer() {
-        return answer;
-    }
-
-    private Integer setId() {
-        return new SecureRandom().nextInt(0, 1000);
+    public Quiz(final UUID id,
+                final String title,
+                final String text,
+                final List<String> options,
+                final List<Integer> answer) {
+        this.id = id;
+        this.title = title;
+        this.text = text;
+        this.options = options;
+        this.answer = answer;
     }
 }

@@ -10,7 +10,7 @@ import training.quizTdd.infrastructure.api.dtos.QuizRequestDto
 import training.quizTdd.infrastructure.api.exceptions.QuizNotFoundException
 
 @SpringBootTest
-class QuizControllerIntegrationText extends Specification {
+class QuizControllerIntegrationTest extends Specification {
 
     def title = 'someTitle'
     def text = 'someText'
@@ -56,7 +56,6 @@ class QuizControllerIntegrationText extends Specification {
         then: 'number of returned quizzes is 2'
         response.getStatusCode().value() == 200
         response.body.size() == 2
-        response.body.get(1).id() > 0
         response.body.get(1).options().size() == 4
     }
 
