@@ -22,6 +22,6 @@ class QuizCrudRepositoryTest extends Specification {
         def result = quizRepository.save(entity)
 
         then: 'id is set'
-        result.id != ""
+        result.id != null
     }
 }

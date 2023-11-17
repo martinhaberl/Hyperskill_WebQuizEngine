@@ -2,7 +2,6 @@ package training.quizTdd.infrastructure.api
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import spock.lang.Ignore
 import spock.lang.Specification
 import training.quizTdd.appcore.domainservices.IQuizRepository
 import training.quizTdd.appcore.domainservices.IQuizService
@@ -106,7 +105,7 @@ class QuizControllerIntegrationTest extends Specification {
         thrown(QuizNotFoundException)
 
     }
-    
+
     def 'a correct answer returns a positive feedback'() {
         given: 'a service to process quizzes'
         IQuizService quizService = new QuizService(iQuizRepository)
@@ -153,8 +152,6 @@ class QuizControllerIntegrationTest extends Specification {
         response.getBody() == answerResponseDto
     }
 
-    @Ignore
-    //fixme Expected exception of type 'training.quizTdd.infrastructure.api.exceptions.QuizNotFoundException', but got 'java.util.NoSuchElementException'
     def 'answering a quiz that does not exist returns 404'() {
         given: 'a service to process quizzes'
         IQuizService quizService = new QuizService(iQuizRepository)

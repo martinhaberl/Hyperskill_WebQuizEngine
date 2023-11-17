@@ -47,7 +47,7 @@ class QuizPersistenceAdapterIntegrationTest extends Specification {
         def id = UUID.randomUUID()
 
         when: 'quiz is requested by id'
-        def result = adapter.getQuizById(id)
+        adapter.getQuizById(id)
 
         then: 'matching quiz is returned'
         thrown(NoSuchElementException)

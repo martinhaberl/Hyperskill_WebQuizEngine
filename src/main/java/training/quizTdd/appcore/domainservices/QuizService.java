@@ -74,8 +74,4 @@ public class QuizService implements IQuizService {
     private Answer getNegativeAnswer() {
         return new Answer(false, "Wrong answer! Please, try again.");
     }
-
-    private Answer getQuizDoesNotExistAnswer() {
-        return new Answer(false, "Quiz does not exist.");
-    }
 }

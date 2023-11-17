@@ -175,7 +175,6 @@ class QuizControllerMockMvcTest extends Specification {
     }
 
     @Unroll
-    //Fixme: rethrow NoSuchElementException: Use custom No such Quiz exception
     def "solving a non-existing quiz should return a not-found-status"() {
         when: 'an invalid quizId is received'
         def result = requestToSolveQuiz(quizId, '{ \"answer\": [0,1]}')
