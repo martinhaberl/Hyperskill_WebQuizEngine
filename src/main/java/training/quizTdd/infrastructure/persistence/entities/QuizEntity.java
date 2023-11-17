@@ -8,9 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -18,13 +15,11 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Getter
 @Table(name = "quiz")
 public class QuizEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Setter(AccessLevel.PACKAGE)
     private UUID id;
 
     @Column(name = "title", nullable = false)
@@ -50,6 +45,26 @@ public class QuizEntity {
         this.text = text;
         this.options = options;
         this.answers = answers;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public List<String> getOptions() {
+        return options;
+    }
+
+    public List<Integer> getAnswers() {
+        return answers;
     }
 }
 
