@@ -59,8 +59,6 @@ class QuizControllerIntegrationTest extends Specification {
 
         then: 'number of returned quizzes is 2'
         response.getStatusCode().value() == 200
-/*        response.body.size() >= 2
-        response.body.get(1).options().size() == 3*/
     }
 
 
@@ -96,7 +94,7 @@ class QuizControllerIntegrationTest extends Specification {
         and: '1 quiz'
         controller.createQuiz(quizRequestDto)
         and: 'an invalid id of created quiz'
-        def quizId = UUID.randomUUID()
+        def quizId = (Math.random() * 10000).toLong().abs()
 
         when: 'quiz is requested by invalid id'
         controller.getQuiz(quizId)
@@ -160,7 +158,7 @@ class QuizControllerIntegrationTest extends Specification {
         and: 'some request with an answer'
         AnswersRequestDto answersRequestDto = new AnswersRequestDto(List.of())
         and: 'some QuizId'
-        def someQuizId = UUID.randomUUID()
+        def someQuizId = (Math.random() * 10000).toLong().abs()
 
         when: 'an answer to a non-existing quiz is given'
         controller.solveQuiz(someQuizId, answersRequestDto)

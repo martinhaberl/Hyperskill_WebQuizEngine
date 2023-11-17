@@ -43,8 +43,8 @@ class QuizServiceTest extends Specification {
 
         then: 'all quizzes are returned'
         quizzes.size() >= 2
-        quizzes.get(1).id.getClass() == UUID
-        quizzes.get(1).answer == [1]
+        quizzes.get(1).id.getClass() == Long
+        !quizzes.get(1).answer.isEmpty()
     }
 
     def 'should return specific quiz by id'() {

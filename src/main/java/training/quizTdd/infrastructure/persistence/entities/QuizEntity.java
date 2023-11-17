@@ -12,15 +12,14 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "quiz")
 public class QuizEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -47,7 +46,7 @@ public class QuizEntity {
         this.answers = answers;
     }
 
-    public UUID getId() {
+    public long getId() {
         return id;
     }
 

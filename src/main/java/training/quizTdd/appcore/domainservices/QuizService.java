@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Service
 public class QuizService implements IQuizService {
@@ -34,12 +33,12 @@ public class QuizService implements IQuizService {
     }
 
     @Override
-    public Quiz getQuiz(UUID quizId) {
+    public Quiz getQuiz(long quizId) {
         return repository.getQuizById(quizId);
     }
 
     @Override
-    public Answer solveQuiz(UUID quizId, List<Integer> givenAnswers) {
+    public Answer solveQuiz(long quizId, List<Integer> givenAnswers) {
 
         Quiz quiz = getQuiz(quizId);
 

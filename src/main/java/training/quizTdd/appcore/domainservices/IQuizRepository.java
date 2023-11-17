@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import training.quizTdd.appcore.domainmodel.Quiz;
 
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public interface IQuizRepository {
@@ -12,6 +11,6 @@ public interface IQuizRepository {
 
     List<Quiz> getQuizzes();
 
-    Quiz getQuizById(UUID id);
+    Quiz getQuizById(long id);
 
 }

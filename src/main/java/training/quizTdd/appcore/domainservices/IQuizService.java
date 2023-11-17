@@ -5,7 +5,6 @@ import training.quizTdd.appcore.domainmodel.Answer;
 import training.quizTdd.appcore.domainmodel.Quiz;
 
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public interface IQuizService {
@@ -17,8 +16,8 @@ public interface IQuizService {
 
     List<Quiz> getQuizzes();
 
-    Quiz getQuiz(UUID id);
+    Quiz getQuiz(long id);
 
-    Answer solveQuiz(UUID id,
+    Answer solveQuiz(long id,
                      List<Integer> answers);
 }

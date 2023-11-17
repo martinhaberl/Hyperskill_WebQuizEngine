@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class QuizPersistenceAdapter implements IQuizRepository {
@@ -49,10 +48,10 @@ public class QuizPersistenceAdapter implements IQuizRepository {
     }
 
     @Override
-    public Quiz getQuizById(final UUID id) {
+    public Quiz getQuizById(final long id) {
         final Optional<QuizEntity> storedEntityOptional = quizCrudRepository.findById(id);
 
         return storedEntityOptional.map(QuizPersistenceAdapter::map).orElseThrow(NoSuchElementException::new);
-
     }
 }
+

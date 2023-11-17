@@ -3,11 +3,10 @@ package training.quizTdd.appcore.domainmodel;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public class Quiz {
-    private UUID id;
+    private long id;
     private String title;
     private String text;
     private List<String> options;
@@ -26,7 +25,7 @@ public class Quiz {
     public Quiz() {
     }
 
-    public Quiz(final UUID id,
+    public Quiz(final long id,
                 final String title,
                 final String text,
                 final List<String> options,
@@ -38,7 +37,7 @@ public class Quiz {
         this.answer = answer;
     }
 
-    public UUID getId() {
+    public long getId() {
         return id;
     }
 
@@ -58,3 +57,4 @@ public class Quiz {
         return answer;
     }
 }
+

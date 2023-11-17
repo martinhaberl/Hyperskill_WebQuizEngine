@@ -20,7 +20,7 @@ class QuizServiceSpringBootTest extends Specification {
 
         then: 'a quiz instance is returned'
         quiz != null
-        quiz.id.getClass() == UUID
+        quiz.id.getClass() == Long
         quiz.title.contains('quizTitle')
         quiz.text.contains('quizQuestion')
         quiz.options[0].contains('option')
@@ -43,8 +43,8 @@ class QuizServiceSpringBootTest extends Specification {
     }
 
     def "should return quiz by its id"() {
-        given: 'UUID of a stored quiz'
-        def id = UUID.fromString('000a34c2-58fe-4922-9e3e-fe1f6de35c32')
+        given: 'ID of a stored quiz'
+        def id = 1L
         when: 'quiz is retrieved from database'
         def result = quizService.getQuiz(id)
 
@@ -54,8 +54,8 @@ class QuizServiceSpringBootTest extends Specification {
     }
 
     def "giving correct answer returns positive feedback"() {
-        given: 'UUID of a stored quiz'
-        def id = UUID.fromString('000a34c2-58fe-4922-9e3e-fe1f6de35c32')
+        given: 'ID of a stored quiz'
+        def id = 1L
         and: 'correct answer'
         def correctAnswer = [1]
 
@@ -69,10 +69,10 @@ class QuizServiceSpringBootTest extends Specification {
 
 
     def "giving wrong answer returns negative feedback"() {
-        given: 'UUID of a stored quiz'
-        def id = UUID.fromString('000a34c2-58fe-4922-9e3e-fe1f6de35c32')
+        given: 'ID of a stored quiz'
+        def id = 1L
         and: 'wrong answer'
-        def correctAnswer = [0]
+        def correctAnswer = [0, 1]
 
         when: 'answer is checked'
         def result = quizService.solveQuiz(id, correctAnswer)

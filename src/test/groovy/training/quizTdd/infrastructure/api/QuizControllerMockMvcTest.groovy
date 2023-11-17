@@ -183,10 +183,10 @@ class QuizControllerMockMvcTest extends Specification {
         result.andReturn().response.status == 404
 
         where:
-        quizId                       | _
-        UUID.randomUUID().toString() | _
-        UUID.randomUUID().toString() | _
-        UUID.randomUUID().toString() | _
+        quizId                                             | _
+        (Math.random() * 100000).toLong().abs().toString() | _
+        (Math.random() * 100000).toLong().abs().toString() | _
+        (Math.random() * 100000).toLong().abs().toString() | _
     }
 
     @Unroll
