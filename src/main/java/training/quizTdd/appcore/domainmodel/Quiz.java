@@ -28,6 +28,7 @@ public class Quiz {
         this.answer = answer;
     }
 
+
     public Quiz(final UUID id,
                 final String title,
                 final String text,

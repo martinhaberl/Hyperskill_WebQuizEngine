@@ -3,69 +3,68 @@ package training.quizTdd.appcore.domainservices;
 import org.springframework.stereotype.Service;
 import training.quizTdd.appcore.domainmodel.Answer;
 import training.quizTdd.appcore.domainmodel.Quiz;
+import training.quizTdd.infrastructure.api.exceptions.QuizNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class QuizService implements IQuizService {
 
-    private final List<Quiz> quizzes = new ArrayList<>();
+    private final IQuizRepository repository;
 
-    public QuizService() {
+    public QuizService(IQuizRepository repository) {
+        this.repository = repository;
     }
 
     @Override
-    public Quiz createQuiz(String title, String text, List<String> options, List<Integer> answer) {
-        Quiz quiz = new Quiz(title, text, options, answer);
-        quizzes.add(quiz);
-        return quiz;
+    public Quiz createQuiz(final String title,
+                           final String text,
+                           final List<String> options,
+                           final List<Integer> answer) {
+
+        return repository.createQuiz(title, text, options, answer);
     }
 
     @Override
     public List<Quiz> getQuizzes() {
-        return quizzes;
+        return repository.getQuizzes();
     }
 
     @Override
-    public Optional<Quiz> getQuiz(Integer quizId) {
-        return quizzes.stream().filter(quiz -> Objects.equals(quiz.getId(), quizId)).findFirst();
+    public Quiz getQuiz(UUID quizId) {
+        return repository.getQuizById(quizId);
     }
 
     @Override
-    public Optional<Answer> solveQuiz(Integer quizId, List<Integer> givenAnswers) {
-
-        Optional<Quiz> quizOptional = getQuiz(quizId);
-
-        if (quizOptional.isEmpty()) {
-            return Optional.of(getQuizDoesNotExistAnswer());
-        }
-
-        if (quizOptional.isPresent()) {
+    public Answer solveQuiz(UUID quizId, List<Integer> givenAnswers) {
+        try {
+            Quiz quiz = getQuiz(quizId);
 
             ArrayList<Integer> sortableGivenAnswers = new ArrayList<>(givenAnswers);
-            ArrayList<Integer> sortableStoredAnwers = new ArrayList<>(quizOptional.get().getAnswer());
+            ArrayList<Integer> sortableStoredAnswers = new ArrayList<>(quiz.getAnswer());
 
-            if (quizOptional.get().getAnswer().size() != givenAnswers.size()) {
-                return Optional.of(getNegativeAnswer());
+            if (quiz.getAnswer().size() != givenAnswers.size()) {
+                return getNegativeAnswer();
             }
-
 
             if (givenAnswers.size() > 1) {
                 Collections.sort(sortableGivenAnswers);
-                Collections.sort(sortableStoredAnwers);
+                Collections.sort(sortableStoredAnswers);
             }
 
-            if (Objects.equals(sortableGivenAnswers, sortableStoredAnwers)) {
-                return Optional.of(getPositiveAnswer());
+            if (Objects.equals(sortableGivenAnswers, sortableStoredAnswers)) {
+                return getPositiveAnswer();
             } else {
-                return Optional.of(getNegativeAnswer());
+                return getNegativeAnswer();
             }
+        } catch (NoSuchElementException e) {
+            throw new QuizNotFoundException(e.getMessage());
         }
-        return Optional.of(new Answer(false, "den Fall habe ich wohl noch  nicht betrachtet"));
     }
 
     private Answer getPositiveAnswer() {

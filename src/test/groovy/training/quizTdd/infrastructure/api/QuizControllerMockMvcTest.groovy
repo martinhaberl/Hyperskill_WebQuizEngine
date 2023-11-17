@@ -161,7 +161,7 @@ class QuizControllerMockMvcTest extends Specification {
 
         when: 'a correct answer is given'
         def correctAnswersJson = '{ \"answer\": %s }'.formatted(correctAnswer)
-        def result = solveQuiz(createdQuizWith2CorrectAnswers.id, correctAnswersJson)
+        def result = requestToSolveQuiz(createdQuizWith2CorrectAnswers.id.toString(), correctAnswersJson)
 
         then: 'a positive feedback is returned'
         result.andReturn().response.status == 200
@@ -175,19 +175,19 @@ class QuizControllerMockMvcTest extends Specification {
     }
 
     @Unroll
+    //Fixme: rethrow NoSuchElementException: Use custom No such Quiz exception
     def "solving a non-existing quiz should return a not-found-status"() {
         when: 'an invalid quizId is received'
-        def result = solveQuiz(quizId, '{ \"answer\": [0,1]}')
+        def result = requestToSolveQuiz(quizId, '{ \"answer\": [0,1]}')
 
         then: 'a not-found-status is returned'
         result.andReturn().response.status == 404
 
         where:
-        quizId | _
-        123456 | _
-        987654 | _
-        741852 | _
-        96315  | _
+        quizId                       | _
+        UUID.randomUUID().toString() | _
+        UUID.randomUUID().toString() | _
+        UUID.randomUUID().toString() | _
     }
 
     @Unroll
@@ -199,7 +199,7 @@ class QuizControllerMockMvcTest extends Specification {
 
         when: 'wrong answer is sent'
         def wrongAnswersJson = '{ \"answer\": %s }'.formatted(wrongAnswer)
-        def result = solveQuiz(createdQuiz.getId(), wrongAnswersJson)
+        def result = requestToSolveQuiz(createdQuiz.getId().toString(), wrongAnswersJson)
 
         then: 'negative feedback is returned'
         result.andReturn().response.status == 200
@@ -225,7 +225,7 @@ class QuizControllerMockMvcTest extends Specification {
 
         when: 'correct empty answer is sent'
         def emptyAnswersJson = '{ \"answer\": [] }'
-        def result = solveQuiz(createdQuiz.getId(), emptyAnswersJson)
+        def result = requestToSolveQuiz(createdQuiz.getId().toString(), emptyAnswersJson)
 
         then: 'positive feedback is returned'
         result.andReturn().response.status == 200
@@ -235,8 +235,8 @@ class QuizControllerMockMvcTest extends Specification {
                 .value('Congratulations, you\'re right!'))
     }
 
-    private solveQuiz(int quizId, String answersJson) {
-        def url = '/api/quizzes/%d/solve'.formatted(quizId)
+    private requestToSolveQuiz(String quizId, String answersJson) {
+        def url = '/api/quizzes/%s/solve'.formatted(quizId)
         mvc.perform(MockMvcRequestBuilders
                 .post(url)
                 .content(answersJson)

@@ -7,6 +7,6 @@ import training.quizTdd.infrastructure.persistence.entities.QuizEntity;
 import java.util.UUID;
 
 @Repository
-public interface QuizRepository extends CrudRepository<QuizEntity, UUID> {
+public interface QuizCrudRepository extends CrudRepository<QuizEntity, UUID> {
 
 }

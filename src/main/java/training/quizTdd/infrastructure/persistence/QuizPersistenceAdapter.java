@@ -14,14 +14,14 @@ import java.util.UUID;
 @Service
 public class QuizPersistenceAdapter implements IQuizRepository {
 
-    private final QuizRepository quizRepository;
+    private final QuizCrudRepository quizCrudRepository;
 
-    public QuizPersistenceAdapter(QuizRepository quizRepository) {
-        this.quizRepository = quizRepository;
+    public QuizPersistenceAdapter(QuizCrudRepository quizCrudRepository) {
+        this.quizCrudRepository = quizCrudRepository;
     }
 
-    private static QuizEntity map(final Quiz quiz) {
-        return new QuizEntity(quiz.getTitle(), quiz.getText(), quiz.getOptions(), quiz.getAnswer());
+    private static QuizEntity map(final String title, final String text, final List<String> options, final List<Integer> answers) {
+        return new QuizEntity(title, text, options, answers);
     }
 
     private static Quiz map(final QuizEntity savedEntity) {
@@ -29,28 +29,30 @@ public class QuizPersistenceAdapter implements IQuizRepository {
     }
 
     @Override
-    public Quiz createQuiz(final Quiz quiz) {
-        QuizEntity entity = map(quiz);
-        final QuizEntity storedEntity = quizRepository.save(entity);
+    public Quiz createQuiz(String title, String text, List<String> options, List<Integer> answers) {
+        QuizEntity entity = map(title, text, options, answers);
+        final QuizEntity storedEntity = quizCrudRepository.save(entity);
 
         return map(storedEntity);
     }
 
     @Override
-    public List<QuizEntity> getQuizzes() {
-        final Iterable<QuizEntity> storedEntities = quizRepository.findAll();
-        final List<QuizEntity> entities = new ArrayList<QuizEntity>();
+    public List<Quiz> getQuizzes() {
+        final Iterable<QuizEntity> storedEntities = quizCrudRepository.findAll();
+        final List<Quiz> quizzes = new ArrayList<>();
 
-        storedEntities.forEach(entities::add);
+        for (QuizEntity entity : storedEntities) {
+            quizzes.add(map(entity));
+        }
 
-        return entities;
+        return quizzes;
     }
 
     @Override
     public Quiz getQuizById(final UUID id) {
-        final Optional<QuizEntity> storedEntityOptional = quizRepository.findById(id);
+        final Optional<QuizEntity> storedEntityOptional = quizCrudRepository.findById(id);
 
-        return storedEntityOptional.map(QuizPersistenceAdapter::map)
-                .orElseThrow(NoSuchElementException::new);
+        return storedEntityOptional.map(QuizPersistenceAdapter::map).orElseThrow(NoSuchElementException::new);
+
     }
 }

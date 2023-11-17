@@ -6,15 +6,14 @@ import spock.lang.Specification
 import training.quizTdd.infrastructure.persistence.entities.QuizEntity
 
 @SpringBootTest
-class QuizRepositoryTest extends Specification {
+class QuizCrudRepositoryTest extends Specification {
 
     @Autowired
-    QuizRepository quizRepository
+    QuizCrudRepository quizRepository
 
     def "new quiz should be stored"() {
         given: 'a valid quiz entity'
-        def entity = new QuizEntity(UUID.randomUUID(),
-                'someEntityTitle',
+        def entity = new QuizEntity('someEntityTitle',
                 'someEntityText',
                 List.of('someEntityOption1', 'someEntityOption2'),
                 List.of(0))

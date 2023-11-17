@@ -2,15 +2,15 @@ package training.quizTdd.appcore.domainservices;
 
 import org.springframework.stereotype.Component;
 import training.quizTdd.appcore.domainmodel.Quiz;
-import training.quizTdd.infrastructure.persistence.entities.QuizEntity;
 
+import java.util.List;
 import java.util.UUID;
 
 @Component
 public interface IQuizRepository {
-    Quiz createQuiz(Quiz quiz);
+    Quiz createQuiz(String title, String text, List<String> options, List<Integer> answers);
 
-    Iterable<QuizEntity> getQuizzes();
+    List<Quiz> getQuizzes();
 
     Quiz getQuizById(UUID id);
 

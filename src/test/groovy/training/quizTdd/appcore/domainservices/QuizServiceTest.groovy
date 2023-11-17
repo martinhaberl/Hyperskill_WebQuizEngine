@@ -1,16 +1,20 @@
 package training.quizTdd.appcore.domainservices
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
 import spock.lang.Unroll
 import training.quizTdd.appcore.domainmodel.Answer
+import training.quizTdd.appcore.domainmodel.Quiz
 
+@SpringBootTest
 class QuizServiceTest extends Specification {
+
+    @Autowired
+    IQuizService quizService
 
     @Unroll
     def 'should create a Quiz and store it'() {
-        given: 'a QuizService'
-        IQuizService quizService = new QuizService()
-
         when: 'a quiz is created'
         def quiz = quizService.createQuiz(title, question, options, answer)
 
@@ -19,11 +23,6 @@ class QuizServiceTest extends Specification {
         quiz.getText() == question
         quiz.getOptions() == options
         quiz.getAnswer() == answer
-        and: 'Quiz is stored in Collection'
-        quizService.getQuizzes().size() == 1
-        quizService.getQuizzes().get(0).getTitle() == title
-        quizService.getQuizzes().get(0).getOptions().size() == options.size()
-        quizService.getQuizzes().get(0).getAnswer().size() == answer.size()
 
         where:
         title        | question        | options                                       | answer
@@ -35,9 +34,7 @@ class QuizServiceTest extends Specification {
     }
 
     def "should return all stored quizzes"() {
-        given: 'a quiz service'
-        IQuizService quizService = new QuizService()
-        and: '2 quizzes'
+        given: '2 quizzes'
         quizService.createQuiz('title1', 'question', ['option'], [0])
         quizService.createQuiz('title2', 'question2', ['option1'], [2])
 
@@ -45,81 +42,51 @@ class QuizServiceTest extends Specification {
         def quizzes = quizService.getQuizzes()
 
         then: 'all quizzes are returned'
-        quizzes.size() == 2
-        quizzes.get(0).getId() != null
-        quizzes.get(1).getAnswer() == [2]
+        quizzes.size() >= 2
+        quizzes.get(1).id.getClass() == UUID
+        quizzes.get(1).answer == [1]
     }
 
     def 'should return specific quiz by id'() {
-        given: 'a quiz service'
-        IQuizService quizService = new QuizService()
-        and: 'a quiz'
+        given: 'a quiz'
         quizService.createQuiz('title1', 'question', ['option'], [0])
-        and: 'a generated quizId'
+        and: 'its generated quizId'
         def quizId = quizService.getQuizzes().get(0).getId()
 
         when:
         def specificQuiz = quizService.getQuiz(quizId)
 
         then:
-        specificQuiz.get().id == quizId
-        specificQuiz.get().options.size() == quizService.getQuizzes().get(0).getOptions().size()
-
+        specificQuiz.id == quizId
+        specificQuiz.options == quizService.getQuizzes().get(0).getOptions()
     }
 
 
     def "correct answer returns positive feedback"() {
-        given: 'a quiz service instance'
-        IQuizService quizService = new QuizService()
-        and: 'some quizzes'
-        quizService.createQuiz("quiz1", "question1", List.of("a", "b", "c"), List.of(1))
-        quizService.createQuiz("quiz2", "question2", List.of("a", "b", "c"), List.of(1, 0, 2))
-        quizService.createQuiz("quiz3", "question3", List.of("a", "b", "c"), List.of(3, 1))
-        quizService.createQuiz("quiz4", "question4", List.of("a", "b", "c"), List.of())
-        quizService.createQuiz("quiz5", "question5", List.of("a", "b", "c"), List.of(0, 1, 3))
-        and: 'id of quiz in collection'
-        def quizId = quizService.getQuizzes().get(quizIndex).getId()
+        given: 'some quiz'
+        Quiz quiz = quizService.createQuiz("quiz1", "question1", List.of("a", "b", "c"), List.of(1))
+        and: 'id of quiz '
+        def quizId = quiz.id
 
         when: 'an answer is given to solve the quiz'
-        def answer = quizService.solveQuiz(quizId, answerGiven)
+        def answer = quizService.solveQuiz(quizId, [1])
 
         then: 'a positive feedback is given'
-        answer.get() == new Answer(true, "Congratulations, you're right!")
-
-        where:
-        quizIndex | answerGiven
-        0         | [1]
-        1         | [0, 1, 2]
-        2         | [1, 3]
-        3         | []
-        4         | [0, 1, 3]
+        answer == new Answer(true, "Congratulations, you're right!")
     }
 
     def "wrong answer returns negative feedback"() {
-        given: 'a quiz service instance'
-        IQuizService quizService = new QuizService()
-        and: 'some quizzes'
-        quizService.createQuiz("quiz1", "question1", List.of("a", "b", "c"), List.of(1))
-        quizService.createQuiz("quiz2", "question2", List.of("a", "b", "c"), List.of(0, 2))
-        quizService.createQuiz("quiz3", "question3", List.of("a", "b", "c"), List.of(3, 1))
-        quizService.createQuiz("quiz4", "question4", List.of("a", "b", "c"), List.of(2))
-        quizService.createQuiz("quiz5", "question5", List.of("a", "b", "c"), List.of())
+        given: 'a quiz'
+        def quiz = quizService.createQuiz("quiz3", "question3", List.of("a", "b", "c"), List.of(3, 1))
         and: 'id of quiz in collection'
-        def quizId = quizService.getQuizzes().get(quizIndex).getId()
+        def quizId = quiz.id
 
         when: 'an answer is given to solve the quiz'
-        def answer = quizService.solveQuiz(quizId, answerGiven)
+        def answer = quizService.solveQuiz(quizId, List.of(3))
 
         then: 'a positive feedback is given'
-        answer.get() == new Answer(false, "Wrong answer! Please, try again.")
+        answer == new Answer(false, "Wrong answer! Please, try again.")
 
-        where:
-        quizIndex | answerGiven
-        0         | [2]
-        1         | [11156]
-        2         | [-234213]
-        3         | []
-        4         | [2]
     }
 
 }

@@ -1,9 +1,8 @@
 package training.quizTdd.appcore.domainmodel
 
-import org.springframework.boot.test.context.SpringBootTest
+
 import spock.lang.Specification
 
-@SpringBootTest
 class QuizTest extends Specification {
 
     def 'should return Quiz instance'() {
@@ -22,9 +21,6 @@ class QuizTest extends Specification {
         instance.getOptions() == options
         instance.getAnswer() == answer
         instance.getAnswer()[1] == answer[1]
-        and: 'quiz got an id'
-        instance.getId() != null
-        instance.getId() > 0
     }
 
 }

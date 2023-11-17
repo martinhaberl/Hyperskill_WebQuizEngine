@@ -3,7 +3,6 @@ package training.quizTdd.infrastructure.persistence
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
-import training.quizTdd.mocks.QuizzesForTestingFactory
 
 @SpringBootTest
 class QuizPersistenceAdapterIntegrationTest extends Specification {
@@ -12,11 +11,8 @@ class QuizPersistenceAdapterIntegrationTest extends Specification {
     QuizPersistenceAdapter adapter
 
     def "should store quiz"() {
-        given: 'a Quiz'
-        def quiz = QuizzesForTestingFactory.createOneQuizForTests()
-
         when: 'quiz is stored'
-        def result = adapter.createQuiz(quiz)
+        def result = adapter.createQuiz("quiz1", "question1", List.of("a", "b", "c"), List.of(1))
 
         then: 'quiz with set id is returned from database'
         result.id != null
