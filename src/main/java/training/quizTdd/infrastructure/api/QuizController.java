@@ -75,23 +75,30 @@ public class QuizController {
 
             return ResponseEntity.ok().body(quizResponseDto);
         } catch (NoSuchElementException e) {
-            throw new QuizNotFoundException(e.getMessage());
+            throw getQuizNotFoundException(id.toString());
         }
     }
 
     @PostMapping("/api/quizzes/{id}/solve")
     public ResponseEntity<AnswerResponseDto> solveQuiz(@PathVariable("id") @NotNull UUID quizId,
                                                        @RequestBody AnswersRequestDto answersRequestDto) {
+        try {
+            Answer answer = quizService.solveQuiz(quizId, answersRequestDto.answer());
 
-        Answer answer = quizService.solveQuiz(quizId, answersRequestDto.answer());
+            if (answer.feedback().equals("Quiz does not exist.")) {
+                throw getQuizNotFoundException(quizId.toString());
+            }
 
-        if (answer.feedback().equals("Quiz does not exist.")) {
-            throw new QuizNotFoundException("Quiz with id %s does not exist.".formatted(quizId));
+            AnswerResponseDto answerResponseDto = new AnswerResponseDto(answer.success(),
+                    answer.feedback());
+
+            return ResponseEntity.ok().body(answerResponseDto);
+        } catch (NoSuchElementException e) {
+            throw getQuizNotFoundException(quizId.toString());
         }
+    }
 
-        AnswerResponseDto answerResponseDto = new AnswerResponseDto(answer.success(),
-                answer.feedback());
-
-        return ResponseEntity.ok().body(answerResponseDto);
+    private static QuizNotFoundException getQuizNotFoundException(final String quizId) {
+        return new QuizNotFoundException("Quiz with id %s does not exist.".formatted(quizId));
     }
 }
