@@ -2,13 +2,16 @@ package training.quizTdd.infrastructure.api;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import training.quizTdd.appcore.domainmodel.Answer;
 import training.quizTdd.appcore.domainmodel.Quiz;
 import training.quizTdd.appcore.domainservices.IQuizService;
@@ -95,6 +98,17 @@ public class QuizController {
             return ResponseEntity.ok().body(answerResponseDto);
         } catch (NoSuchElementException e) {
             throw getQuizNotFoundException(String.valueOf(quizId));
+        }
+    }
+
+    @DeleteMapping("/api/quizzes/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<?> deleteQuiz(@PathVariable("id") long id) {
+        try {
+            quizService.deleteQuiz(id);
+            return ResponseEntity.noContent().build();
+        } catch (NoSuchElementException e) {
+            throw getQuizNotFoundException(String.valueOf(id));
         }
     }
 }

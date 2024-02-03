@@ -13,4 +13,6 @@ public interface IQuizRepository {
 
     Quiz getQuizById(long id);
 
+    void deleteQuizById(long id);
+
 }

@@ -20,4 +20,6 @@ public interface IQuizService {
 
     Answer solveQuiz(long id,
                      List<Integer> answers);
+
+    void deleteQuiz(long id);
 }

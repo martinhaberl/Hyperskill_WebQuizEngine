@@ -56,7 +56,6 @@ class QuizControllerMockMvcTest extends Specification {
     def "should return a specific quiz"() {
         given: 'a quiz'
         def quiz = createQuiz(quizBContentJSON)
-
         Quiz createdQuiz = objectMapper.readValue(quiz.andReturn().getResponse().getContentAsString(), Quiz.class)
 
         when: 'specific quiz is requested by id'
@@ -232,6 +231,31 @@ class QuizControllerMockMvcTest extends Specification {
                 .value(true))
         result.andExpect(MockMvcResultMatchers.jsonPath('$.feedback')
                 .value('Congratulations, you\'re right!'))
+    }
+
+    def "deleting a quiz successfully returns status 204"() {
+        given: 'a quiz'
+        def quiz = createQuiz(quizBContentJSON)
+        Quiz createdQuiz = objectMapper.readValue(quiz.andReturn().getResponse().getContentAsString(), Quiz.class)
+
+        when: 'specific quiz is deleted by id'
+        def createdId = createdQuiz.getId()
+        def requestedQuiz = mvc.perform(MockMvcRequestBuilders
+                .delete('/api/quizzes/{id}', createdId))
+
+        then: 'status code 204 is returned'
+        requestedQuiz.andReturn().response.status == 204
+    }
+
+    def "deleting a non-existing quiz returns status 404"() {
+        given: 'some random quiz id'
+        def quizId = 1234567890l
+        when: 'a non-existing quiz is deleted'
+        def requestedQuiz = mvc.perform(MockMvcRequestBuilders
+                .delete('/api/quizzes/{id}', quizId))
+
+        then: 'status code 404 is returned'
+        requestedQuiz.andReturn().response.status == 404
     }
 
     private requestToSolveQuiz(String quizId, String answersJson) {

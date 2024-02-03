@@ -1,5 +1,6 @@
 package training.quizTdd.appcore.domainservices
 
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
@@ -86,7 +87,22 @@ class QuizServiceTest extends Specification {
 
         then: 'a positive feedback is given'
         answer == new Answer(false, "Wrong answer! Please, try again.")
+    }
 
+    def "should delete quiz"() {
+        given: 'a quiz'
+        def quiz = quizService.createQuiz("quiz3", "question3", List.of("a", "b", "c"), List.of(3, 1))
+
+        and: 'id of persisted quiz'
+        def quizId = quiz.id
+
+        when: 'quiz is deleted'
+        quizService.deleteQuiz(quizId)
+        and: 'deleted quiz is requestd'
+        quizService.getQuiz(quizId)
+
+        then: 'Exception is thrown'
+        thrown(RuntimeException)
     }
 
 }

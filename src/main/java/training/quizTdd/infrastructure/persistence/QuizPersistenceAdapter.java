@@ -53,5 +53,10 @@ public class QuizPersistenceAdapter implements IQuizRepository {
 
         return storedEntityOptional.map(QuizPersistenceAdapter::map).orElseThrow(NoSuchElementException::new);
     }
+
+    @Override
+    public void deleteQuizById(final long id) {
+        quizCrudRepository.deleteById(id);
+    }
 }
 

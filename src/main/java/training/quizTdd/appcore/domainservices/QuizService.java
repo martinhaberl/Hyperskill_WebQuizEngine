@@ -7,6 +7,7 @@ import training.quizTdd.appcore.domainmodel.Quiz;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @Service
@@ -68,5 +69,14 @@ public class QuizService implements IQuizService {
 
     private Answer getNegativeAnswer() {
         return new Answer(false, "Wrong answer! Please, try again.");
+    }
+
+    @Override
+    public void deleteQuiz(final long id) {
+        if (repository.getQuizById(id) == null) {
+            throw new NoSuchElementException();
+        } else {
+            repository.deleteQuizById(id);
+        }
     }
 }
