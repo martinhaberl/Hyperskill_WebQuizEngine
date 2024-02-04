@@ -2,6 +2,7 @@ package training.quizTdd.infrastructure.api
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.security.crypto.password.PasswordEncoder
 import spock.lang.Specification
 import training.quizTdd.appcore.domainservices.IQuizRepository
 import training.quizTdd.appcore.domainservices.IQuizService
@@ -10,12 +11,18 @@ import training.quizTdd.infrastructure.api.dtos.AnswerResponseDto
 import training.quizTdd.infrastructure.api.dtos.AnswersRequestDto
 import training.quizTdd.infrastructure.api.dtos.QuizRequestDto
 import training.quizTdd.infrastructure.api.exceptions.QuizNotFoundException
+import training.quizTdd.infrastructure.persistence.AppUserRepository
 
 @SpringBootTest
 class QuizControllerIntegrationTest extends Specification {
 
     @Autowired
     IQuizRepository iQuizRepository
+
+    @Autowired
+    AppUserRepository appUserRepository
+    @Autowired
+    PasswordEncoder passwordEncoder
 
     def title = 'someTitle'
     def text = 'someText'
@@ -27,7 +34,7 @@ class QuizControllerIntegrationTest extends Specification {
         and: 'a QuizService'
         IQuizService quizService = new QuizService(iQuizRepository)
         and: 'a RestController for Quiz requests'
-        QuizController controller = new QuizController(quizService)
+        QuizController controller = new QuizController(quizService, appUserRepository, passwordEncoder)
         and: 'a Quiz Request DTO'
         QuizRequestDto quizRequestDto = new QuizRequestDto(title, text, options, answer)
 
@@ -47,7 +54,7 @@ class QuizControllerIntegrationTest extends Specification {
         and: 'a QuizService'
         IQuizService quizService = new QuizService(iQuizRepository)
         and: 'a RestController for Quiz requests'
-        QuizController controller = new QuizController(quizService)
+        QuizController controller = new QuizController(quizService, appUserRepository, passwordEncoder)
         and: 'a Quiz Request DTO'
         QuizRequestDto quizRequestDto = new QuizRequestDto(title, text, options, answer)
         and: '2 quizzes'
@@ -67,7 +74,7 @@ class QuizControllerIntegrationTest extends Specification {
         and: 'a QuizService'
         IQuizService quizService = new QuizService(iQuizRepository)
         and: 'a RestController for Quiz requests'
-        QuizController controller = new QuizController(quizService)
+        QuizController controller = new QuizController(quizService, appUserRepository, passwordEncoder)
         and: 'a Quiz Request DTO'
         QuizRequestDto quizRequestDto = new QuizRequestDto(title, text, options, answer)
         and: '1 quiz'
@@ -88,7 +95,7 @@ class QuizControllerIntegrationTest extends Specification {
         and: 'a QuizService'
         IQuizService quizService = new QuizService(iQuizRepository)
         and: 'a RestController for Quiz requests'
-        QuizController controller = new QuizController(quizService)
+        QuizController controller = new QuizController(quizService, appUserRepository, passwordEncoder)
         and: 'a Quiz Request DTO'
         QuizRequestDto quizRequestDto = new QuizRequestDto(title, text, options, answer)
         and: '1 quiz'
@@ -108,7 +115,7 @@ class QuizControllerIntegrationTest extends Specification {
         given: 'a service to process quizzes'
         IQuizService quizService = new QuizService(iQuizRepository)
         and: 'a RestController for Quiz requests'
-        QuizController controller = new QuizController(quizService)
+        QuizController controller = new QuizController(quizService, appUserRepository, passwordEncoder)
         and: 'a quiz to solve'
         def quizToSolve = quizService.createQuiz("title", "text", List.of("option", "option2"), [0, 1])
         def quizId = quizToSolve.id
@@ -131,7 +138,7 @@ class QuizControllerIntegrationTest extends Specification {
         given: 'a service to process quizzes'
         IQuizService quizService = new QuizService(iQuizRepository)
         and: 'a RestController for Quiz requests'
-        QuizController controller = new QuizController(quizService)
+        QuizController controller = new QuizController(quizService, appUserRepository, passwordEncoder)
         and: 'some quiz to solve'
         def quizToSolve = quizService.createQuiz("title", "text", List.of("option", "option2"), [0])
         def quizId = quizToSolve.id
@@ -154,7 +161,7 @@ class QuizControllerIntegrationTest extends Specification {
         given: 'a service to process quizzes'
         IQuizService quizService = new QuizService(iQuizRepository)
         and: 'a RestController for Quiz requests'
-        QuizController controller = new QuizController(quizService)
+        QuizController controller = new QuizController(quizService, appUserRepository, passwordEncoder)
         and: 'some request with an answer'
         AnswersRequestDto answersRequestDto = new AnswersRequestDto(List.of())
         and: 'some QuizId'

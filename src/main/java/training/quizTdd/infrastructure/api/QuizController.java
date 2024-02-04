@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,7 +20,10 @@ import training.quizTdd.infrastructure.api.dtos.AnswerResponseDto;
 import training.quizTdd.infrastructure.api.dtos.AnswersRequestDto;
 import training.quizTdd.infrastructure.api.dtos.QuizRequestDto;
 import training.quizTdd.infrastructure.api.dtos.QuizResponseDto;
+import training.quizTdd.infrastructure.api.dtos.RegistrationRequestDto;
 import training.quizTdd.infrastructure.api.exceptions.QuizNotFoundException;
+import training.quizTdd.infrastructure.persistence.AppUserRepository;
+import training.quizTdd.infrastructure.persistence.entities.AppUserEntity;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -29,13 +33,33 @@ import java.util.NoSuchElementException;
 public class QuizController {
 
     private final IQuizService quizService;
+    private final AppUserRepository appUserRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public QuizController(IQuizService quizService) {
+    public QuizController(IQuizService quizService, AppUserRepository appUserRepository, PasswordEncoder passwordEncoder) {
         this.quizService = quizService;
+        this.appUserRepository = appUserRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     private static QuizNotFoundException getQuizNotFoundException(final String quizId) {
         return new QuizNotFoundException("Quiz with id %s does not exist.".formatted(quizId));
+    }
+
+    @PostMapping("/api/register")
+    public ResponseEntity<?> register(@RequestBody RegistrationRequestDto request) {
+        try {
+            AppUserEntity user = new AppUserEntity();
+            user.setUsername(request.email());
+            user.setPassword(passwordEncoder.encode(request.password()));
+            user.setAuthority("ROLE_USER");
+
+            final AppUserEntity persistedUser = appUserRepository.save(user);
+
+            return ResponseEntity.ok().body("New user registered successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("User name is already taken.");
+        }
     }
 
     @PostMapping("/api/quizzes")
