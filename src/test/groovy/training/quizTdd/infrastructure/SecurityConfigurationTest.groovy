@@ -24,11 +24,13 @@ class SecurityFilterChainTest extends Specification {
     QuizController controller = Mock()
 
     def "GET request to /api/quizzes should be open for everyone"() {
-        when: "a GET request is made to /register"
+        when: "a GET request is made to /api/quizzes"
         def result = mockMvc.perform(get("/api/quizzes"))
 
         then: "the response status is OK"
         result.andExpect(status().isOk())
+        and: "mocked controller method getAllQuizzes is called once"
+        1 * controller.getAllQuizzes()
     }
 
     @Ignore
