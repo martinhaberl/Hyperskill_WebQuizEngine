@@ -23,7 +23,19 @@ class SecurityFilterChainTest extends Specification {
     @SpringBean
     QuizController controller = Mock()
 
-    def "GET request to /api/quizzes should be open for everyone"() {
+    def "GET request to /api/quizzes should be blocked for non-authenticated users"() {
+        when: "a GET request is made to /api/quizzes"
+        def result = mockMvc.perform(get("/api/quizzes"))
+
+        then: "the response status is unauthorized"
+        result.andExpect(status().isUnauthorized())
+        and: "mocked controller method getAllQuizzes is not called"
+        0 * controller.getAllQuizzes()
+    }
+
+    @Ignore
+    //fixme: authentication is missing
+    def "GET request to /api/quizzes should be open for authenticated users"() {
         when: "a GET request is made to /api/quizzes"
         def result = mockMvc.perform(get("/api/quizzes"))
 
@@ -31,6 +43,16 @@ class SecurityFilterChainTest extends Specification {
         result.andExpect(status().isOk())
         and: "mocked controller method getAllQuizzes is called once"
         1 * controller.getAllQuizzes()
+    }
+
+    def "GET request to /api/quizzes/{id} should be open for authenticated users"() {
+        when: "a GET request is made to /api/quizzes/{id}"
+        def result = mockMvc.perform(get("/api/quizzes/000"))
+
+        then: "the response status is OK"
+        result.andExpect(status().isUnauthorized())
+        and: "mocked controller method getAllQuizzes is not called"
+        0 * controller.getQuiz(000)
     }
 
     @Ignore
