@@ -23,6 +23,16 @@ class SecurityFilterChainTest extends Specification {
     @SpringBean
     QuizController controller = Mock()
 
+    def "POST request to /api/register should be accessible for everyone"() {
+        when: "a POST request is made to /api/register"
+        def result = mockMvc.perform(post("/api/register"))
+
+        then: "the response status is ok"
+        result.andExpect(status().isOk())
+        and: "mocked controller method getAllQuizzes is not called"
+        1 * controller.register(_)
+    }
+
     def "GET request to /api/quizzes should be blocked for non-authenticated users"() {
         when: "a GET request is made to /api/quizzes"
         def result = mockMvc.perform(get("/api/quizzes"))

@@ -21,6 +21,7 @@ public class SecurityConfiguration {
                 .csrf(configurer -> configurer.disable()).headers(cfg -> cfg.frameOptions().disable()) // for POST requests via Postman
                 .authorizeHttpRequests(authorize ->
                         authorize
+                                .requestMatchers(HttpMethod.POST, "/api/register").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/quizzes").authenticated()
                 )
                 .build();
