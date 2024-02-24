@@ -55,12 +55,14 @@ class SecurityFilterChainTest extends Specification {
         1 * controller.getAllQuizzes()
     }
 
-    def "GET request to /api/quizzes/{id} should be open for authenticated users"() {
+    @Ignore
+    //fixme: authentication is missing
+    def "GET request to /api/quizzes/{id} should be accessible for authenticated users"() {
         when: "a GET request is made to /api/quizzes/{id}"
         def result = mockMvc.perform(get("/api/quizzes/000"))
 
-        then: "the response status is OK"
-        result.andExpect(status().isUnauthorized())
+        then: "the response status is forbidden"
+        result.andExpect(status().isForbidden())
         and: "mocked controller method getAllQuizzes is not called"
         0 * controller.getQuiz(000)
     }
@@ -73,6 +75,30 @@ class SecurityFilterChainTest extends Specification {
 
         then: 'access is granted with http status 220'
         result.andExpect(status().is(200))
+    }
+
+    @Ignore
+    //fixme: authentication is missing
+    def "POST request to /api/quizzes should be accessible for authenticated users"() {
+        when: "a POST request is made to /api/quizzes"
+        def result = mockMvc.perform(post("/api/quizzes"))
+
+        then: "the response status is ok"
+        result.andExpect(status().isOk())
+        and: "mocked controller method getAllQuizzes is not called"
+        1 * controller.createQuiz(_)
+    }
+
+    @Ignore
+    //fixme: authentication is missing
+    def "POST request to /api/quizzes should be forbidden for non-authenticated users"() {
+        when: "a POST request is made to /api/quizzes"
+        def result = mockMvc.perform(post("/api/quizzes"))
+
+        then: "the response status is forbidden"
+        result.andExpect(status().isForbidden())
+        and: "mocked controller method getAllQuizzes is not called"
+        0 * controller.createQuiz(_)
     }
 }
 

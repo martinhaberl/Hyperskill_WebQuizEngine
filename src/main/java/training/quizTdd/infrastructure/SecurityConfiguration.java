@@ -22,7 +22,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize ->
                         authorize
                                 .requestMatchers(HttpMethod.POST, "/api/register").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/quizzes").authenticated()
+                                .requestMatchers("/api/quizzes").authenticated()
                 )
                 .build();
     }
