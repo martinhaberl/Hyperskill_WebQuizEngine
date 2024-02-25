@@ -21,6 +21,7 @@ public class SecurityConfiguration {
                 .csrf(configurer -> configurer.disable()).headers(cfg -> cfg.frameOptions().disable()) // for POST requests via Postman
                 .authorizeHttpRequests(authorize ->
                         authorize
+                                .requestMatchers("/actuator/shutdown").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/register").permitAll()
                                 .requestMatchers("/api/quizzes/*").authenticated()
                                 .anyRequest().denyAll()
@@ -38,16 +39,10 @@ public class SecurityConfiguration {
 /*    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, MvcRequestMatcher.Builder mvc) throws Exception {
         httpSecurity
-                .httpBasic(Customizer.withDefaults())     // Default Basic auth config
-                .csrf(configurer -> configurer.disable()).headers(cfg -> cfg.frameOptions().disable()) // for POST requests via Postman
-                .authorizeHttpRequests(authorize ->
-                        authorize
-                                .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/register")).permitAll()
                 .authorizeHttpRequests(matcherRegistry -> matcherRegistry
-                        .requestMatchers(mvc.pattern("/api/register")).permitAll()
+
                         .requestMatchers(mvc.pattern("/actuator/shutdown")).permitAll()
-                        .requestMatchers(mvc.pattern("/api/quizzes")).authenticated()
-                        .anyRequest().denyAll()
+
                 );
 
         return httpSecurity.build();

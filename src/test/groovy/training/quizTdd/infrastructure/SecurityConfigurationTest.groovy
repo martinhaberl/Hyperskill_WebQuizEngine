@@ -134,5 +134,14 @@ class SecurityFilterChainTest extends Specification {
         then: "the response status is unauthorized"
         result.andExpect(status().isUnauthorized())
     }
+
+    def "POST request to /actuator/shutdown should be accessible for visitors so hyperskill tests will work"() {
+        when: "a POST request is made to /actuator/shutdown"
+        def result = mockMvc.perform(post("/actuator/shutdown"))
+
+        then: 'access is granted with http status 200 OK, but actual is 404 since app is not running'
+        result.andExpect(status().isNotFound())
+    }
+
 }
 
